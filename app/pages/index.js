@@ -1,6 +1,7 @@
-import { useConnection, useWallet } from "@solana/wallet-adapter-react";
+import { useWallet } from "@solana/wallet-adapter-react";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import React, { useEffect } from "react";
+import CandyMachine from "../components/CandyMachine";
 
 const Home = () => {
     const wallet = useWallet();
@@ -26,7 +27,11 @@ const Home = () => {
                 <div className="header-container">
                     <p className="header">🍭 Candy Drop</p>
                     <p className="sub-text">NFT drop machine with fair mint</p>
-                    {wallet.publicKey ? "Hello" : renderNotConnectedContainer()}
+                    {wallet.publicKey ? (
+                        <CandyMachine walletAddress={wallet} />
+                    ) : (
+                        renderNotConnectedContainer()
+                    )}
                 </div>
             </div>
         </div>

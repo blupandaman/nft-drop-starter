@@ -1,15 +1,21 @@
-import { web3 } from "@project-serum/anchor";
 import * as anchor from "@project-serum/anchor";
+import { web3 } from "@project-serum/anchor";
 import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
-import { SystemProgram } from "@solana/web3.js";
-import { LAMPORTS_PER_SOL, SYSVAR_RENT_PUBKEY, TransactionInstruction } from "@solana/web3.js";
+import {
+    LAMPORTS_PER_SOL,
+    SystemProgram,
+    SYSVAR_RENT_PUBKEY,
+    TransactionInstruction,
+} from "@solana/web3.js";
 
 // CLI Properties Given to us
 const candyMachineProgram = new web3.PublicKey("cndy3Z4yapfJBmL3ShUp5exZKqR3z33thTzeNMm2gRZ");
 
 const TOKEN_METADATA_PROGRAM_ID = new web3.PublicKey("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s");
 
-const SPL_ASSOCIATED_TOKEN_ACCOUNT_PROGRAM_ID = new web3.PublicKey("ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL");
+const SPL_ASSOCIATED_TOKEN_ACCOUNT_PROGRAM_ID = new web3.PublicKey(
+    "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
+);
 
 const CIVIC = new anchor.web3.PublicKey("gatem74V238djXdzWnJf94Wo1DcnuGkfijbf3AuBhfs");
 
@@ -52,17 +58,30 @@ const getAtaForMint = async (mint, buyer) => {
 };
 
 const getNetworkExpire = async (gatekeeperNetwork) => {
-    return await anchor.web3.PublicKey.findProgramAddress([gatekeeperNetwork.toBuffer(), Buffer.from("expire")], CIVIC);
-};
-
-const getNetworkToken = async (wallet, gatekeeperNetwork) => {
     return await anchor.web3.PublicKey.findProgramAddress(
-        [wallet.toBuffer(), Buffer.from("gateway"), Buffer.from([0, 0, 0, 0, 0, 0, 0, 0]), gatekeeperNetwork.toBuffer()],
+        [gatekeeperNetwork.toBuffer(), Buffer.from("expire")],
         CIVIC
     );
 };
 
-function createAssociatedTokenAccountInstruction(associatedTokenAddress, payer, walletAddress, splTokenMintAddress) {
+const getNetworkToken = async (wallet, gatekeeperNetwork) => {
+    return await anchor.web3.PublicKey.findProgramAddress(
+        [
+            wallet.toBuffer(),
+            Buffer.from("gateway"),
+            Buffer.from([0, 0, 0, 0, 0, 0, 0, 0]),
+            gatekeeperNetwork.toBuffer(),
+        ],
+        CIVIC
+    );
+};
+
+function createAssociatedTokenAccountInstruction(
+    associatedTokenAddress,
+    payer,
+    walletAddress,
+    splTokenMintAddress
+) {
     const keys = [
         {
             pubkey: payer,

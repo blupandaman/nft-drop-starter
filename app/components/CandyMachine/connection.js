@@ -54,11 +54,24 @@ export async function sendTransactionsWithManualRetry(connection, wallet, instru
 
         try {
             if (instructions.length === 1) {
-                const id = await sendTransactionWithRetry(connection, wallet, instructions[0], filteredSigners[0], "single");
+                const id = await sendTransactionWithRetry(
+                    connection,
+                    wallet,
+                    instructions[0],
+                    filteredSigners[0],
+                    "single"
+                );
                 ids.push(id.txid);
                 stopPoint = 1;
             } else {
-                const { txs } = await sendTransactions(connection, wallet, instructions, filteredSigners, "StopOnFailure", "single");
+                const { txs } = await sendTransactions(
+                    connection,
+                    wallet,
+                    instructions,
+                    filteredSigners,
+                    "StopOnFailure",
+                    "single"
+                );
                 ids = ids.concat(txs.map((t) => t.txid));
             }
         } catch (e) {
@@ -126,7 +139,12 @@ export const sendTransactions = async (
     const pendingTxns = [];
 
     let breakEarlyObject = { breakEarly: false, i: 0 };
-    console.log("Signed txns length", signedTxns.length, "vs handed in length", instructionSet.length);
+    console.log(
+        "Signed txns length",
+        signedTxns.length,
+        "vs handed in length",
+        instructionSet.length
+    );
     for (let i = 0; i < signedTxns.length; i++) {
         const signedTxnPromise = sendSignedTransaction({
             connection,
@@ -185,7 +203,9 @@ export const sendTransaction = async (
 
     let transaction = new Transaction();
     instructions.forEach((instruction) => transaction.add(instruction));
-    transaction.recentBlockhash = (block || (await connection.getRecentBlockhash(commitment))).blockhash;
+    transaction.recentBlockhash = (
+        block || (await connection.getRecentBlockhash(commitment))
+    ).blockhash;
 
     if (includesFeePayer) {
         transaction.setSigners(...signers.map((s) => s.publicKey));
@@ -214,7 +234,12 @@ export const sendTransaction = async (
     let slot = 0;
 
     if (awaitConfirmation) {
-        const confirmation = await awaitTransactionSignatureConfirmation(txid, DEFAULT_TIMEOUT, connection, commitment);
+        const confirmation = await awaitTransactionSignatureConfirmation(
+            txid,
+            DEFAULT_TIMEOUT,
+            connection,
+            commitment
+        );
 
         if (!confirmation) throw new Error("Timed out awaiting confirmation on transaction");
         slot = confirmation?.slot || 0;
@@ -244,7 +269,9 @@ export const sendTransactionWithRetry = async (
 
     let transaction = new Transaction();
     instructions.forEach((instruction) => transaction.add(instruction));
-    transaction.recentBlockhash = (block || (await connection.getRecentBlockhash(commitment))).blockhash;
+    transaction.recentBlockhash = (
+        block || (await connection.getRecentBlockhash(commitment))
+    ).blockhash;
 
     if (includesFeePayer) {
         transaction.setSigners(...signers.map((s) => s.publicKey));
@@ -281,7 +308,11 @@ export const getUnixTs = () => {
 
 const DEFAULT_TIMEOUT = 15000;
 
-export async function sendSignedTransaction({ signedTransaction, connection, timeout = DEFAULT_TIMEOUT }) {
+export async function sendSignedTransaction({
+    signedTransaction,
+    connection,
+    timeout = DEFAULT_TIMEOUT,
+}) {
     const rawTransaction = signedTransaction.serialize();
     const startTime = getUnixTs();
     let slot = 0;
@@ -301,7 +332,13 @@ export async function sendSignedTransaction({ signedTransaction, connection, tim
         }
     })();
     try {
-        const confirmation = await awaitTransactionSignatureConfirmation(txid, timeout, connection, "recent", true);
+        const confirmation = await awaitTransactionSignatureConfirmation(
+            txid,
+            timeout,
+            connection,
+            "recent",
+            true
+        );
 
         if (!confirmation) throw new Error("Timed out awaiting confirmation on transaction");
 
@@ -318,14 +355,17 @@ export async function sendSignedTransaction({ signedTransaction, connection, tim
         }
         let simulateResult = null;
         try {
-            simulateResult = (await simulateTransaction(connection, signedTransaction, "single")).value;
+            simulateResult = (await simulateTransaction(connection, signedTransaction, "single"))
+                .value;
         } catch (e) {}
         if (simulateResult && simulateResult.err) {
             if (simulateResult.logs) {
                 for (let i = simulateResult.logs.length - 1; i >= 0; --i) {
                     const line = simulateResult.logs[i];
                     if (line.startsWith("Program log: ")) {
-                        throw new Error("Transaction failed: " + line.slice("Program log: ".length));
+                        throw new Error(
+                            "Transaction failed: " + line.slice("Program log: ".length)
+                        );
                     }
                 }
             }
@@ -362,7 +402,13 @@ async function simulateTransaction(connection, transaction, commitment) {
     return res.result;
 }
 
-async function awaitTransactionSignatureConfirmation(txid, timeout, connection, commitment = "recent", queryStatus = false) {
+async function awaitTransactionSignatureConfirmation(
+    txid,
+    timeout,
+    connection,
+    commitment = "recent",
+    queryStatus = false
+) {
     let done = false;
     let status = {
         slot: 0,
@@ -389,7 +435,7 @@ async function awaitTransactionSignatureConfirmation(txid, timeout, connection, 
                         slot: context.slot,
                         confirmations: 0,
                     };
-                    if (result.err) {
+                    if (result.err === null) {
                         console.log("Rejected via websocket", result.err);
                         reject(status);
                     } else {
@@ -434,7 +480,7 @@ async function awaitTransactionSignatureConfirmation(txid, timeout, connection, 
         }
     });
 
-    //@ts-ignore
+    // @ts-ignore
     if (connection._signatureSubscriptions[subId]) connection.removeSignatureListener(subId);
     done = true;
     console.log("Returning status", status);

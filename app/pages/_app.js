@@ -7,7 +7,7 @@ import { useMemo } from "react";
 
 import "@solana/wallet-adapter-react-ui/styles.css";
 import "../styles/App.css";
-import "../styles/CandyMachine.css";
+// import "../styles/CandyMachine.css";
 import "../styles/globals.css";
 
 const App = ({ Component, pageProps }) => {
