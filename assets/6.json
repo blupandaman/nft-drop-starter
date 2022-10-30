@@ -1,0 +1,24 @@
+{
+  "name": "3 x 1",
+  "symbol": "PB",
+  "description": "Collection of 9 pixels on the blockchain. This is pixel 7/9.",
+  "image": "6.png",
+  "attributes": [
+    {
+      "trait_type": "Row",
+      "value": "1"
+    },
+    {
+      "trait_type": "Column",
+      "value": "3"
+    }
+  ],
+  "properties": {
+    "files": [
+      {
+        "uri": "6.png",
+        "type": "image/png"
+      }
+    ]
+  }
+}

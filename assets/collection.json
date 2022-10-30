@@ -1,0 +1,15 @@
+{
+  "name": "Pixel Blocks",
+  "symbol": "PB",
+  "description": "Collection of 9 pixels on the blockchain.",
+  "image": "collection.png",
+  "attributes": [],
+  "properties": {
+    "files": [
+      {
+        "uri": "collection.png",
+        "type": "image/png"
+      }
+    ]
+  }
+}
